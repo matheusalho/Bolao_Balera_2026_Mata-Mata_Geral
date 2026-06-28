@@ -11,4 +11,4 @@ window.READ_ENDPOINT = 'https://defaulta4a0857a652e45f494b1685bad4ec3.bd.environ
 
 /* Link usado no botão de compartilhar (CTA "Faça o seu palpite") e o rótulo exibido no card. */
 window.PALPITES_URL = 'https://matheusalho.github.io/Palpites_Mata-Mata/';
-window.SHARE_URL_LABEL = 'bolao.balera.com.br';
+window.SHARE_URL_LABEL = 'matheusalho.github.io/Palpites_Mata-Mata';
