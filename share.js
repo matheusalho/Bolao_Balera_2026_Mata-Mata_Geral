@@ -83,7 +83,7 @@ window.Share = (function () {
 
     // título da lista
     x.fillStyle = '#8aa0b5'; x.font = '900 ' + (L.big ? 24 : 20) + 'px ' + FONT;
-    x.fillText('TODOS OS PALPITES', pad, L.gamesTop - 26);
+    x.fillText(window.BRASIL_ONLY ? 'PALPITES · JOGOS DO BRASIL' : 'TODOS OS PALPITES', pad, L.gamesTop - 26);
 
     // jogos
     var perCol = Math.ceil(JOGOS.length / L.cols);

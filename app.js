@@ -5,6 +5,7 @@
 (function () {
   'use strict';
   var IS_AMARO = window.APP_VARIANT === 'amaro';
+  var BRASIL_ONLY = !!window.BRASIL_ONLY; // versão "só jogos do Brasil" (dados já vêm filtrados; aqui só protege a publicação)
   var JOGOS = (window.CHAVEAMENTO && window.CHAVEAMENTO.jogos) || [];
   var ELENCOS = window.ELENCOS || {};
   var GOL_CONTRA = '(gol contra)';
@@ -135,7 +136,7 @@
       + (autoState === 'loading' ? ' <span class="loadingdot">• atualizando…</span>' : '');
     view.innerHTML =
       '<div class="card">' +
-      '<div class="hd"><div><h2>Ranking Geral</h2><div class="muted">' + sub + '</div></div>' +
+      '<div class="hd"><div><h2>' + (BRASIL_ONLY ? 'Ranking — Jogos do Brasil' : 'Ranking Geral') + '</h2><div class="muted">' + sub + '</div></div>' +
       '<div class="hd-actions">' + refreshBtn + '<input class="search" placeholder="Buscar participante..." value="' + esc(search) + '" oninput="MM.busca(this.value)"></div></div>' +
       '<div class="tablewrap"><table><thead><tr>' +
       '<th>Pos</th><th class="nome">Participante</th><th title="Placares exatos (cravadas)">Cravadas</th><th title="Pontos de placar (10/5)">Placar</th><th title="Pontos de artilheiros (10/15)">Artilheiros</th><th>Total</th>' +
@@ -215,7 +216,7 @@
   }
 
   function renderJogos() {
-    var ro = !IS_AMARO; // só o Amaro edita/publica resultados; Geral é somente leitura
+    var ro = !IS_AMARO || BRASIL_ONLY; // Geral é leitura; nas versões Brasil ninguém publica (resultados vêm do app cheio, p/ não apagar os demais jogos)
     var cards = JOGOS.map(function (j) {
       var r = realResults[j.id] || { home: '', away: '', homeScorers: [], awayScorers: [] };
       var nh = r.home === '' || r.home == null ? 0 : +r.home;
@@ -506,6 +507,15 @@
     var _h1 = document.querySelector('header h1'); if (_h1) _h1.textContent = 'Mata-Mata · Ranking + Exportação';
     var _sub = document.querySelector('header .sub'); if (_sub) _sub.textContent = 'Bolão Copa 2026 · Amaro';
     document.title = 'Bolão BALERA — Mata-Mata 2026 · Ranking (Amaro / Intranet)';
+  }
+  if (BRASIL_ONLY) {
+    var _hb = document.querySelector('header h1'); if (_hb) _hb.textContent = 'Jogos do Brasil' + (IS_AMARO ? ' · Exportação' : '');
+    var _sb = document.querySelector('header .sub'); if (_sb) _sb.textContent = 'Bolão Copa 2026' + (IS_AMARO ? ' · Amaro' : '');
+    document.querySelectorAll('#tabs button').forEach(function (b) {
+      if (b.dataset.tab === 'ranking') b.textContent = 'Ranking';
+      if (b.dataset.tab === 'brasil') b.textContent = 'Por jogo';
+    });
+    document.title = 'Bolão BALERA — Jogos do Brasil' + (IS_AMARO ? ' (Amaro)' : '');
   }
   render();
   if (READ_ENDPOINT) autoLoad(false);
