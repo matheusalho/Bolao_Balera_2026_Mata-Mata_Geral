@@ -296,7 +296,7 @@
     if (!READ_ENDPOINT) { if (manual) { activeTab = 'carregar'; render(); } return; }
     autoState = 'loading';
     if (activeTab === 'ranking') renderRanking();
-    fetch(READ_ENDPOINT, { cache: 'no-store' })
+    fetch(READ_ENDPOINT, { method: 'POST', cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function (data) {
         var d = (data && data.result) ? data.result : data; // tolera resposta aninhada em "result"
