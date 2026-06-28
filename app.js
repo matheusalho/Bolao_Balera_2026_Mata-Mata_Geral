@@ -25,6 +25,7 @@
   var activeTab = (participants.length || READ_ENDPOINT) ? 'ranking' : 'carregar';
   var search = '';
   var brGameId = null; // jogo do Brasil selecionado na aba "Ranking - Jogos do Brasil"
+  var shareKey = null; // participante aberto no modal de detalhe (p/ compartilhar)
 
   // ---------- helpers ----------
   function norm(s) { return (s == null ? '' : String(s)).trim().toLowerCase(); }
@@ -271,6 +272,7 @@
   function detalhe(key) {
     var p = participants.find(function (x) { return (x.cpf || x.name) === key; });
     if (!p) return;
+    shareKey = key;
     var s = scoreParticipant(p);
     var stType = function (t) { return t === 'exact' ? 'Cravou +10' : t === 'winner' ? 'Vencedor +5' : t === 'order' ? 'Ordem +15' : t === 'names' ? 'Nomes +10' : ''; };
     var lista = function (arr) {
@@ -305,7 +307,7 @@
     var sum = '<div class="dsum"><span class="chip tot">' + s.total + ' pts</span><span class="chip">Placar ' + s.placarPts + '</span><span class="chip">Artilheiros ' + s.scorerPts + '</span><span class="chip">Cravadas ' + s.exact + '</span></div>';
     var m = document.createElement('div'); m.className = 'modal-bg'; m.onclick = function () { m.remove(); };
     m.innerHTML = '<div class="modal modal-detalhe" onclick="event.stopPropagation()">' +
-      '<div class="dhead"><h3>' + esc(p.name) + '</h3><button class="dclose" aria-label="Fechar" onclick="this.closest(\'.modal-bg\').remove()">✕</button></div>' +
+      '<div class="dhead"><h3>' + esc(p.name) + '</h3><div class="dhead-btns"><button class="btn ciano dshare" onclick="MM.compartilhar()">↗ Compartilhar</button><button class="dclose" aria-label="Fechar" onclick="this.closest(\'.modal-bg\').remove()">✕</button></div></div>' +
       sum +
       '<div class="dgames">' + cards + '</div></div>';
     document.body.appendChild(m);
@@ -415,6 +417,13 @@
     go: function (t) { activeTab = t; render(); },
     atualizar: function () { autoLoad(true); },
     selBrasil: function (id) { brGameId = +id; renderRankingBrasil(); },
+    compartilhar: function () {
+      if (typeof Share === 'undefined') { alert('Módulo de compartilhamento indisponível.'); return; }
+      var p = participants.find(function (x) { return (x.cpf || x.name) === shareKey; });
+      if (!p) return;
+      var entry = ranking().find(function (x) { return (x.cpf || x.name) === shareKey; });
+      Share.open({ name: p.name, guesses: p.guesses || {}, pos: entry ? entry.pos : null, total: entry ? entry.total : 0 });
+    },
     publicarResultados: function () {
       var msg = document.getElementById('pubmsg');
       function show(t) { if (msg) { msg.style.display = 'block'; msg.textContent = t; } }

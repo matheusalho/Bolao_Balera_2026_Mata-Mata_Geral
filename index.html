@@ -120,6 +120,16 @@ tbody tr.p1 .pill.tot{background:#D4AF37;color:#1a1300}
 .dcol.hit{background:#f0fdf4}
 .dcol.hit h5{color:#15803d}
 .dcol.hit li .n{background:#22c55e;color:#fff}
+.dhead-btns{display:flex;gap:8px;align-items:center}
+.btn.dshare{padding:9px 14px}
+.share-modal{max-width:460px}
+.share-fmt{display:flex;gap:8px;justify-content:center;margin:14px 0}
+.share-fmt button{background:#eef3f7;color:#26313d;border:1px solid #00000022;border-radius:8px;padding:8px 16px;font-weight:800;cursor:pointer}
+.share-fmt button.active{background:#0b1220;color:#fff}
+.share-prev{display:flex;justify-content:center;margin:4px 0 16px}
+.share-prev img{max-width:250px;width:100%;height:auto;border-radius:12px;box-shadow:0 12px 34px #00000045}
+.share-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.share-tip{color:var(--cinza);font-size:.78rem;margin:14px 4px 0;font-weight:600;text-align:center}
 @media(max-width:700px){.tabs{width:100%;margin-left:0}.games{grid-template-columns:1fr}th{position:static}.hd-actions{width:100%}.hd-actions .search{flex:1}.filters{flex-wrap:wrap}.dscorers{grid-template-columns:1fr}.dcol+.dcol{border-left:0;border-top:1px solid var(--linha)}}
 </style>
 </head>
@@ -142,6 +152,7 @@ tbody tr.p1 .pill.tot{background:#D4AF37;color:#1a1300}
 <script src="./dados-mm.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="./config.js"></script>
+<script src="./share.js"></script>
 <script src="./app.js"></script>
 </body>
 </html>
