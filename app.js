@@ -272,20 +272,42 @@
     var p = participants.find(function (x) { return (x.cpf || x.name) === key; });
     if (!p) return;
     var s = scoreParticipant(p);
-    var rows = s.detail.map(function (d) {
-      function st(x) { return x.type === 'exact' ? 'Cravou (10)' : x.type === 'winner' ? 'Vencedor (5)' : x.type === 'order' ? 'Ordem (15)' : x.type === 'names' ? 'Nomes (10)' : x.type === 'none' ? '—' : '0'; }
-      var g = d.g || {};
-      return '<tr><td class="g">J' + d.j.id + ' ' + esc(d.j.mandante) + ' x ' + esc(d.j.visitante) + '</td>' +
-        '<td>' + (g.home !== undefined && g.home !== '' ? esc(g.home + 'x' + g.away) : '—') + '<br><span class="muted">real ' + esc(d.r.home + 'x' + d.r.away) + '</span></td>' +
-        '<td>' + st(d.ps) + '</td>' +
-        '<td>' + st(d.hs) + ' / ' + st(d.as) + '</td>' +
-        '<td><b>' + (d.ps.pts + d.hs.pts + d.as.pts) + '</b></td></tr>';
+    var stType = function (t) { return t === 'exact' ? 'Cravou +10' : t === 'winner' ? 'Vencedor +5' : t === 'order' ? 'Ordem +15' : t === 'names' ? 'Nomes +10' : ''; };
+    var lista = function (arr) {
+      arr = (arr || []).filter(function (x) { return x; });
+      if (!arr.length) return '<span class="none">— sem gols —</span>';
+      return '<ol>' + arr.map(function (nm, i) { return '<li><span class="n">' + (i + 1) + '</span>' + esc(nm) + '</li>'; }).join('') + '</ol>';
+    };
+    var cards = JOGOS.map(function (j) {
+      var g = (p.guesses || {})[j.id] || {};
+      var r = realResults[j.id];
+      var hasR = hasResult(r);
+      var ps = placarScore(g, r);
+      var hs = scorerScore(g.homeScorers, hasR ? r.homeScorers : null);
+      var as = scorerScore(g.awayScorers, hasR ? r.awayScorers : null);
+      var gamePts = ps.pts + hs.pts + as.pts;
+      var hasPalpite = g.home !== undefined && g.home !== '' && g.home !== null;
+      var scoreTxt = hasPalpite ? (g.home + '<small>x</small>' + g.away) : '<small>sem palpite</small>';
+      var ptsBadge = hasR ? ('<span class="dpts' + (gamePts ? '' : ' zero') + '">+' + gamePts + '</span>') : '<span class="dpts wait">a jogar</span>';
+      var realLine = hasR ? ('<div class="dreal">Resultado: <b>' + esc(j.mandante) + ' ' + r.home + ' x ' + r.away + ' ' + esc(j.visitante) + '</b>' + (stType(ps.type) ? ' · ' + stType(ps.type) : ' · placar 0') + '</div>') : '';
+      return '<div class="dgame' + (j.brasil ? ' br' : '') + '">' +
+        '<div class="dgh"><span class="gnum">J' + j.id + '</span>' +
+        '<span class="dteam">' + esc(j.mandante) + '</span>' +
+        '<span class="dscore ' + (hasR ? ps.type : '') + '">' + scoreTxt + '</span>' +
+        '<span class="dteam">' + esc(j.visitante) + '</span>' +
+        (j.brasil ? '<span class="badge b-brasil">BR</span>' : '') + ptsBadge + '</div>' +
+        realLine +
+        '<div class="dscorers">' +
+        '<div class="dcol' + ((hs.type === 'order' || hs.type === 'names') ? ' hit' : '') + '"><h5>Gols ' + esc(j.mandante) + (hs.pts ? ' · +' + hs.pts : '') + '</h5>' + lista(g.homeScorers) + '</div>' +
+        '<div class="dcol' + ((as.type === 'order' || as.type === 'names') ? ' hit' : '') + '"><h5>Gols ' + esc(j.visitante) + (as.pts ? ' · +' + as.pts : '') + '</h5>' + lista(g.awayScorers) + '</div>' +
+        '</div></div>';
     }).join('');
+    var sum = '<div class="dsum"><span class="chip tot">' + s.total + ' pts</span><span class="chip">Placar ' + s.placarPts + '</span><span class="chip">Artilheiros ' + s.scorerPts + '</span><span class="chip">Cravadas ' + s.exact + '</span></div>';
     var m = document.createElement('div'); m.className = 'modal-bg'; m.onclick = function () { m.remove(); };
-    m.innerHTML = '<div class="modal" onclick="event.stopPropagation()"><h3>' + esc(p.name) + ' — ' + s.total + ' pts</h3>' +
-      '<div class="muted" style="margin-bottom:10px">Placar: ' + s.placarPts + ' · Artilheiros: ' + s.scorerPts + ' · Cravadas: ' + s.exact + '</div>' +
-      (s.detail.length ? '<table class="bk"><thead><tr><th class="g" style="text-align:left">Jogo</th><th>Palpite</th><th>Placar</th><th>Artilheiros (M/V)</th><th>Pts</th></tr></thead><tbody>' + rows + '</tbody></table>' : '<p class="muted">Nenhum jogo com resultado ainda.</p>') +
-      '<div style="text-align:right;margin-top:14px"><button class="btn" onclick="this.closest(\'.modal-bg\').remove()">Fechar</button></div></div>';
+    m.innerHTML = '<div class="modal modal-detalhe" onclick="event.stopPropagation()">' +
+      '<div class="dhead"><h3>' + esc(p.name) + '</h3><button class="dclose" aria-label="Fechar" onclick="this.closest(\'.modal-bg\').remove()">✕</button></div>' +
+      sum +
+      '<div class="dgames">' + cards + '</div></div>';
     document.body.appendChild(m);
   }
 

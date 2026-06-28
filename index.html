@@ -85,7 +85,42 @@ tbody tr.p1 .pill.tot{background:#D4AF37;color:#1a1300}
 .filters label{font-size:.74rem;text-transform:uppercase;color:var(--cinza);font-weight:900;letter-spacing:.03em}
 .filters select{min-height:42px;border:1px solid #00000026;border-radius:8px;font:inherit;font-weight:800;padding:0 14px;max-width:100%;background:#fff;color:var(--azul)}
 .filters select:focus{border-color:var(--ciano);outline:3px solid #00b4ff2e}
-@media(max-width:700px){.tabs{width:100%;margin-left:0}.games{grid-template-columns:1fr}th{position:static}.hd-actions{width:100%}.hd-actions .search{flex:1}.filters{flex-wrap:wrap}}
+.modal-detalhe{max-width:820px}
+.dhead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dhead h3{margin:0;font-size:1.4rem}
+.dclose{background:#0b1220;color:#fff;border:0;border-radius:8px;width:34px;height:34px;font-weight:900;cursor:pointer;flex:0 0 34px;padding:0}
+.dclose:hover{background:var(--ciano);color:#000;filter:none}
+.dsum{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 16px}
+.dsum .chip{background:#f1f5f9;border-radius:999px;padding:5px 13px;font-size:.78rem;font-weight:800;color:#26313d}
+.dsum .chip.tot{background:var(--azul);color:#fff}
+.dgames{display:grid;gap:12px}
+.dgame{border:1px solid var(--linha);border-radius:10px;overflow:hidden}
+.dgame.br{box-shadow:0 0 0 2px #ffeb0066}
+.dgh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#0b1220;color:#fff;padding:9px 12px;font-size:.9rem}
+.dgh .gnum{background:var(--amarelo);color:#000;border-radius:4px;padding:2px 7px;font-weight:900;font-size:.72rem}
+.dgh .dteam{font-weight:800}
+.dgh .dscore{background:#fff;color:#000;border-radius:6px;padding:1px 9px;font-weight:900}
+.dgh .dscore small{color:#94a3b8;font-weight:800;margin:0 1px}
+.dgh .dscore.exact{background:#bbf7d0;color:#14532d}
+.dgh .dscore.winner{background:#fef08a;color:#713f12}
+.dgh .dscore.miss{background:#fecaca;color:#7f1d1d}
+.dgh .dpts{margin-left:auto;background:var(--ouro);color:#1a1300;border-radius:6px;padding:2px 10px;font-weight:900;font-size:.78rem}
+.dgh .dpts.zero{background:#475569;color:#e2e8f0}
+.dgh .dpts.wait{background:#1e293b;color:#94a3b8;font-weight:800}
+.dgh .badge.b-brasil{font-size:.6rem}
+.dreal{font-size:.74rem;color:var(--cinza);padding:7px 12px;background:#f7fafc;font-weight:700;border-bottom:1px solid var(--linha)}
+.dscorers{display:grid;grid-template-columns:1fr 1fr}
+.dcol{padding:10px 12px}
+.dcol+.dcol{border-left:1px solid var(--linha)}
+.dcol h5{margin:0 0 7px;font-size:.66rem;text-transform:uppercase;color:#566170;font-weight:900;letter-spacing:.03em}
+.dcol ol{margin:0;padding:0;list-style:none;display:grid;gap:5px}
+.dcol li{display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600;color:#0b1220}
+.dcol li .n{background:var(--ciano);color:#000;border-radius:50%;width:19px;height:19px;display:grid;place-items:center;font-size:.66rem;font-weight:900;flex:0 0 19px}
+.dcol .none{color:#94a3b8;font-size:.8rem;font-style:italic}
+.dcol.hit{background:#f0fdf4}
+.dcol.hit h5{color:#15803d}
+.dcol.hit li .n{background:#22c55e;color:#fff}
+@media(max-width:700px){.tabs{width:100%;margin-left:0}.games{grid-template-columns:1fr}th{position:static}.hd-actions{width:100%}.hd-actions .search{flex:1}.filters{flex-wrap:wrap}.dscorers{grid-template-columns:1fr}.dcol+.dcol{border-left:0;border-top:1px solid var(--linha)}}
 </style>
 </head>
 <body>
