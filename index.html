@@ -81,7 +81,11 @@ tbody tr.p1 .pill.tot{background:#D4AF37;color:#1a1300}
 .spinner{width:36px;height:36px;border:4px solid #e2e8f0;border-top-color:var(--ciano);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loadingdot{color:var(--ciano);font-weight:800}
-@media(max-width:700px){.tabs{width:100%;margin-left:0}.games{grid-template-columns:1fr}th{position:static}.hd-actions{width:100%}.hd-actions .search{flex:1}}
+.filters{display:flex;justify-content:center;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--linha);background:linear-gradient(90deg,#00b4ff0d,#0000)}
+.filters label{font-size:.74rem;text-transform:uppercase;color:var(--cinza);font-weight:900;letter-spacing:.03em}
+.filters select{min-height:42px;border:1px solid #00000026;border-radius:8px;font:inherit;font-weight:800;padding:0 14px;max-width:100%;background:#fff;color:var(--azul)}
+.filters select:focus{border-color:var(--ciano);outline:3px solid #00b4ff2e}
+@media(max-width:700px){.tabs{width:100%;margin-left:0}.games{grid-template-columns:1fr}th{position:static}.hd-actions{width:100%}.hd-actions .search{flex:1}.filters{flex-wrap:wrap}}
 </style>
 </head>
 <body>
@@ -91,7 +95,8 @@ tbody tr.p1 .pill.tot{background:#D4AF37;color:#1a1300}
     <div><div class="sub">Bolão Copa 2026</div><h1>Mata-Mata · Ranking</h1></div>
   </div>
   <nav class="tabs" id="tabs">
-    <button data-tab="ranking" class="active">Ranking Atualizado</button>
+    <button data-tab="ranking" class="active">Ranking Geral</button>
+    <button data-tab="brasil">Ranking - Jogos do Brasil</button>
     <button data-tab="jogos">Jogos e Resultados</button>
     <button data-tab="regras">Regras</button>
     <button data-tab="carregar">Carregar Palpites</button>

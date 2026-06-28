@@ -24,6 +24,7 @@
   var autoState = ''; // '' | 'loading' | 'ok' | 'error'
   var activeTab = (participants.length || READ_ENDPOINT) ? 'ranking' : 'carregar';
   var search = '';
+  var brGameId = null; // jogo do Brasil selecionado na aba "Ranking - Jogos do Brasil"
 
   // ---------- helpers ----------
   function norm(s) { return (s == null ? '' : String(s)).trim().toLowerCase(); }
@@ -88,6 +89,7 @@
   function render() {
     document.querySelectorAll('#tabs button').forEach(function (b) { b.classList.toggle('active', b.dataset.tab === activeTab); });
     if (activeTab === 'ranking') return renderRanking();
+    if (activeTab === 'brasil') return renderRankingBrasil();
     if (activeTab === 'jogos') return renderJogos();
     if (activeTab === 'regras') return renderRegras();
     if (activeTab === 'carregar') return renderCarregar();
@@ -132,12 +134,68 @@
       + (autoState === 'loading' ? ' <span class="loadingdot">• atualizando…</span>' : '');
     view.innerHTML =
       '<div class="card">' +
-      '<div class="hd"><div><h2>Ranking Atualizado</h2><div class="muted">' + sub + '</div></div>' +
+      '<div class="hd"><div><h2>Ranking Geral</h2><div class="muted">' + sub + '</div></div>' +
       '<div class="hd-actions">' + refreshBtn + '<input class="search" placeholder="Buscar participante..." value="' + esc(search) + '" oninput="MM.busca(this.value)"></div></div>' +
       '<div class="tablewrap"><table><thead><tr>' +
       '<th>Pos</th><th class="nome">Participante</th><th title="Placares exatos (cravadas)">Cravadas</th><th title="Pontos de placar (10/5)">Placar</th><th title="Pontos de artilheiros (10/15)">Artilheiros</th><th>Total</th>' +
       '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
       (IS_AMARO ? '<div class="hd" style="border-top:1px solid var(--linha);border-bottom:0"><div class="muted">Exportar ranking no layout da Intranet</div><button class="btn ouro" onclick="MM.exportar()">Exportar Excel</button></div>' : '') +
+      '</div>';
+  }
+
+  // ---------- Ranking restrito aos jogos do Brasil ----------
+  function brasilGames() {
+    return JOGOS.filter(function (j) { return norm(j.mandante) === 'brasil' || norm(j.visitante) === 'brasil'; });
+  }
+  function rankBrasil(gameId) {
+    var r = realResults[gameId];
+    var arr = participants.map(function (p) {
+      var g = (p.guesses || {})[gameId] || {};
+      var ps = placarScore(g, r);
+      var hs = scorerScore(g.homeScorers, r ? r.homeScorers : null);
+      var as = scorerScore(g.awayScorers, r ? r.awayScorers : null);
+      return { name: p.name, cpf: p.cpf, g: g, placarPts: ps.pts, scorerPts: hs.pts + as.pts, total: ps.pts + hs.pts + as.pts };
+    }).sort(function (a, b) { return b.total - a.total || b.placarPts - a.placarPts || a.name.localeCompare(b.name); });
+    arr.forEach(function (x, i) { x.pos = i + 1; });
+    return arr;
+  }
+  function renderRankingBrasil() {
+    if (!participants.length) {
+      view.innerHTML = '<div class="card"><div class="empty">Nenhum palpite carregado ainda.' + (READ_ENDPOINT ? '<br><br><button class="btn ciano" onclick="MM.atualizar()">Atualizar agora</button>' : '') + '</div></div>';
+      return;
+    }
+    var games = brasilGames();
+    if (!games.length) { view.innerHTML = '<div class="card"><div class="empty">Nenhum jogo do Brasil definido ainda.</div></div>'; return; }
+    if (brGameId == null || !games.some(function (j) { return j.id === brGameId; })) brGameId = games[0].id;
+    var j = jogoById(brGameId);
+    var r = realResults[brGameId];
+    var hasR = hasResult(r);
+    var rk = rankBrasil(brGameId);
+    var filtered = search ? rk.filter(function (x) { return norm(x.name).indexOf(norm(search)) >= 0; }) : rk;
+    var medals = { 1: '🥇', 2: '🥈', 3: '🥉' };
+    var rows = filtered.map(function (x) {
+      var cls = (hasR && x.pos <= 3) ? ' class="p' + x.pos + '"' : '';
+      var pal = (x.g && x.g.home !== undefined && x.g.home !== '') ? esc(x.g.home + 'x' + x.g.away) : '—';
+      return '<tr' + cls + ' onclick="MM.detalhe(\'' + esc(x.cpf || x.name) + '\')">' +
+        '<td class="rankpos">' + ((hasR && medals[x.pos]) ? medals[x.pos] + ' ' : '') + x.pos + 'º</td>' +
+        '<td class="nome">' + esc(x.name) + '</td>' +
+        '<td>' + pal + '</td>' +
+        '<td>' + x.placarPts + '</td>' +
+        '<td>' + x.scorerPts + '</td>' +
+        '<td><span class="pill tot">' + x.total + '</span></td>' +
+        '</tr>';
+    }).join('');
+    var options = games.map(function (g) {
+      var lbl = g.mandante + ' x ' + g.visitante + (g.dataHora ? ' - ' + g.dataHora : '');
+      return '<option value="' + g.id + '"' + (g.id === brGameId ? ' selected' : '') + '>' + esc(lbl) + '</option>';
+    }).join('');
+    var sub = (hasR ? 'Resultado oficial: ' + esc(j.mandante + ' ' + r.home + ' x ' + r.away + ' ' + j.visitante) : 'Aguardando o resultado do jogo') + ' · ' + participants.length + ' participantes';
+    view.innerHTML =
+      '<div class="card">' +
+      '<div class="hd"><div><h2>Ranking — Jogos do Brasil</h2><div class="muted">' + sub + '</div></div>' +
+      '<div class="hd-actions">' + (READ_ENDPOINT ? '<button class="btn ghost" onclick="MM.atualizar()">↻ Atualizar</button>' : '') + '<input class="search" placeholder="Buscar participante..." value="' + esc(search) + '" oninput="MM.busca(this.value)"></div></div>' +
+      '<div class="filters"><label for="brsel">Jogo do Brasil:</label><select id="brsel" onchange="MM.selBrasil(this.value)">' + options + '</select></div>' +
+      '<div class="tablewrap"><table><thead><tr><th>Pos</th><th class="nome">Participante</th><th title="Palpite de placar">Palpite</th><th title="Pontos de placar (10/5)">Placar</th><th title="Pontos de artilheiros (10/15)">Artilheiros</th><th>Total</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
       '</div>';
   }
 
@@ -334,6 +392,7 @@
     _ingest: ingest,
     go: function (t) { activeTab = t; render(); },
     atualizar: function () { autoLoad(true); },
+    selBrasil: function (id) { brGameId = +id; renderRankingBrasil(); },
     publicarResultados: function () {
       var msg = document.getElementById('pubmsg');
       function show(t) { if (msg) { msg.style.display = 'block'; msg.textContent = t; } }
@@ -349,7 +408,7 @@
         .then(function () { show('✓ Resultados publicados (' + results.length + ' jogos). Os colaboradores já veem o ranking atualizado.'); })
         .catch(function (e) { show('Falha ao publicar: ' + e.message); });
     },
-    busca: function (v) { search = v; var rk; clearTimeout(window.__t); window.__t = setTimeout(function () { renderRanking(); var inp = document.querySelector('.search'); if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); } }, 120); },
+    busca: function (v) { search = v; clearTimeout(window.__t); window.__t = setTimeout(function () { (activeTab === 'brasil' ? renderRankingBrasil : renderRanking)(); var inp = document.querySelector('.search'); if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); } }, 120); },
     detalhe: detalhe,
     limpar: function () { if (confirm('Remover todos os palpites carregados?')) { participants = []; save(LS_PART, participants); activeTab = 'carregar'; render(); } },
     upload: function (input) {
