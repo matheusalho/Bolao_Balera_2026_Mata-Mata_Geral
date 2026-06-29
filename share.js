@@ -10,7 +10,7 @@ window.Share = (function () {
   var FASE = (window.CHAVEAMENTO && window.CHAVEAMENTO.faseAtual) || 'Mata-Mata';
   var PALPITES_URL = window.PALPITES_URL || 'https://matheusalho.github.io/Palpites_Mata-Mata/';
   var URL_LABEL = window.SHARE_URL_LABEL || 'bolao.balera.com.br';
-  var FONT = "Arial, 'Segoe UI', sans-serif";
+  var FONT = "'Segoe UI', Arial, sans-serif";
 
   var LAYOUTS = {
     story: { W: 1080, H: 1920, pad: 64, cols: 1, rowH: 74, gamesTop: 612, fs: 31, big: true },
