@@ -216,7 +216,7 @@
   }
 
   function renderJogos() {
-    var ro = !IS_AMARO || BRASIL_ONLY; // Geral é leitura; nas versões Brasil ninguém publica (resultados vêm do app cheio, p/ não apagar os demais jogos)
+    var ro = !IS_AMARO; // só o Amaro edita/publica (inclusive Amaro Brasil — a gravação é incremental/merge, não apaga os outros jogos)
     var cards = JOGOS.map(function (j) {
       var r = realResults[j.id] || { home: '', away: '', homeScorers: [], awayScorers: [] };
       var nh = r.home === '' || r.home == null ? 0 : +r.home;
